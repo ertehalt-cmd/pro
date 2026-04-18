@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Sniper Pro">
+<meta name="theme-color" content="#03070f">
+<title>🎯 Sniper Pro ULTIMATE</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#03070f;--card:#080f20;--border:#0d1f3c;
+  --accent:#00c8ff;--green:#00e87a;--red:#ff2d55;
+  --yellow:#ffc300;--orange:#ff8c00;--text:#c5dcff;--muted:#3a5a8a;
+  --diamond:#b388ff;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100dvh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 50% -5%,rgba(0,200,255,.09) 0%,transparent 50%),
+  radial-gradient(ellipse at 90% 90%,rgba(0,232,122,.04) 0%,transparent 40%)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,200,255,.015) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,200,255,.015) 1px,transparent 1px);background-size:44px 44px}
+.app{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:0 12px 30px}
+
+/* HEADER */
+.hdr{padding:14px 0 12px;text-align:center;border-bottom:1px solid var(–border);margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:rgba(0,200,255,.07);border:1px solid rgba(0,200,255,.15);border-radius:20px;padding:3px 12px;font-size:.58rem;letter-spacing:2px;color:var(–accent);text-transform:uppercase;margin-bottom:7px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(–green);box-shadow:0 0 6px var(–green);animation:blink 1.4s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+h1{font-family:‘Share Tech Mono’,monospace;font-size:1.65rem;letter-spacing:3px;color:var(–accent);text-shadow:0 0 28px rgba(0,200,255,.45)}
+.hdr-sub{font-size:.63rem;color:var(–muted);margin-top:2px}
+.clk-row{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:7px}
+.clk{font-family:‘Share Tech Mono’,monospace;font-size:.92rem;letter-spacing:2px}
+.tz{font-size:.52rem;color:var(–muted);background:var(–card);border:1px solid var(–border);padding:2px 7px;border-radius:8px}
+
+/* PRICE */
+.price-card{background:var(–card);border:1px solid var(–border);border-radius:12px;padding:12px 16px;margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
+.pc-label{font-size:.6rem;color:var(–muted);margin-bottom:3px;letter-spacing:1px}
+.pc-price{font-family:‘Share Tech Mono’,monospace;font-size:1.4rem;color:var(–accent);font-weight:700;letter-spacing:2px}
+.pc-chg{font-size:.65rem;font-weight:700;margin-top:2px}
+.pc-chg.up{color:var(–green)}.pc-chg.dn{color:var(–red)}
+.pc-right{text-align:left}
+.pc-status{font-size:.58rem;color:var(–muted);margin-bottom:3px}
+.pc-updated{font-family:‘Share Tech Mono’,monospace;font-size:.65rem;color:var(–yellow)}
+.pc-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:4px}
+.pc-dot.live{background:var(–green);box-shadow:0 0 6px var(–green);animation:blink 1.4s ease infinite}
+.pc-dot.err{background:var(–red)}
+
+/* MARKET TEMP - فكرة 3 */
+.mtemp{background:var(–card);border:1px solid var(–border);border-radius:11px;padding:10px 14px;margin-bottom:11px}
+.mtemp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.mtemp-lbl{font-size:.6rem;color:var(–muted);letter-spacing:1px}
+.mtemp-val{font-family:‘Share Tech Mono’,monospace;font-size:.85rem;font-weight:700}
+.mtemp-bar{height:8px;border-radius:4px;background:var(–border);overflow:hidden;margin-bottom:5px}
+.mtemp-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.mtemp-labels{display:flex;justify-content:space-between;font-size:.5rem;color:var(–muted)}
+.mtemp-status{font-size:.65rem;font-weight:700;text-align:center;margin-top:4px}
+
+/* SNIPER MODE - فكرة 2 */
+.sniper-mode{background:var(–card);border:1px solid var(–border);border-radius:11px;padding:10px 14px;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between}
+.sniper-info{font-size:.65rem}
+.sniper-lbl{font-weight:700;color:var(–accent);margin-bottom:2px}
+.sniper-sub{color:var(–muted);font-size:.58rem}
+.sniper-btn{padding:7px 14px;border-radius:20px;border:none;font-family:‘Cairo’,sans-serif;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .3s}
+.sniper-btn.off{background:rgba(0,200,255,.08);border:1px solid var(–accent);color:var(–accent)}
+.sniper-btn.on{background:var(–red);color:#fff;animation:pulse 1s ease infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,45,85,.4)}50%{box-shadow:0 0 0 8px rgba(255,45,85,0)}}
+
+/* SESSIONS */
+.slbl{font-size:.57rem;letter-spacing:2px;text-transform:uppercase;color:var(–muted);margin-bottom:6px}
+.sess{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:9px}
+.s{background:var(–card);border:1px solid var(–border);border-radius:9px;padding:7px 3px 6px;text-align:center;transition:all .3s}
+.s.open{border-color:rgba(0,232,122,.35);background:rgba(0,232,122,.04)}
+.s.best{border-color:rgba(255,195,0,.45);background:rgba(255,195,0,.05);box-shadow:0 0 12px rgba(255,195,0,.1)}
+.sf{font-size:.88rem}.sn{font-size:.5rem;color:var(–muted);margin:2px 0 3px;font-weight:700}
+.sp{font-size:.48rem;font-weight:700;padding:2px 4px;border-radius:6px;display:inline-block}
+.sp.open{background:rgba(0,232,122,.12);color:var(–green)}
+.sp.closed{background:rgba(13,31,60,.6);color:var(–muted)}
+.sp.best{background:rgba(255,195,0,.12);color:var(–yellow)}
+.ov{font-size:.46rem;color:var(–orange);display:block;margin-top:2px}
+.mkt{border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:9px;margin-bottom:11px;border:1px solid;transition:all .3s}
+.mkt.hot{background:rgba(255,195,0,.05);border-color:rgba(255,195,0,.22)}
+.mkt.ok{background:rgba(0,232,122,.04);border-color:rgba(0,232,122,.18)}
+.mkt.off{background:rgba(255,45,85,.04);border-color:rgba(255,45,85,.15)}
+.mi{font-size:1.1rem;flex-shrink:0}
+.mm{font-weight:700;font-size:.75rem;display:block;margin-bottom:1px}
+.ms{font-size:.6rem;color:var(–muted)}
+
+/* QUIET MARKET WARNING - فكرة 13 */
+.quiet-warn{display:none;background:rgba(255,140,0,.06);border:1px solid rgba(255,140,0,.25);border-radius:11px;padding:11px 14px;margin-bottom:11px;text-align:center}
+.quiet-warn.show{display:block}
+.qw-i{font-size:1.5rem;margin-bottom:4px}
+.qw-t{color:var(–orange);font-weight:700;font-size:.8rem}
+.qw-s{color:var(–muted);font-size:.63rem;margin-top:3px}
+
+/* BLOCKER */
+.blocker{background:rgba(255,45,85,.06);border:1px solid rgba(255,45,85,.2);border-radius:12px;padding:14px;text-align:center;margin-bottom:11px;display:none}
+.blocker.show{display:block}
+.bl-i{font-size:1.8rem;margin-bottom:5px}
+.bl-t{color:var(–red);font-weight:700;font-size:.85rem;margin-bottom:3px}
+.bl-s{font-size:.67rem;color:var(–muted);line-height:1.6}
+.bl-n{color:var(–yellow);font-weight:700;font-size:.75rem;margin-top:7px}
+
+/* TF */
+.tf-row{display:flex;gap:6px;margin-bottom:11px;justify-content:center}
+.tf-pill{padding:5px 14px;border-radius:20px;border:1px solid var(–border);background:var(–card);color:var(–muted);font-size:.68rem;cursor:pointer;transition:all .2s;font-family:‘Cairo’,sans-serif;font-weight:600}
+.tf-pill.active{border-color:var(–accent);color:var(–accent);background:rgba(0,200,255,.08);box-shadow:0 0 10px rgba(0,200,255,.15)}
+
+/* BTNS */
+.btn-row{display:flex;gap:8px;margin-bottom:11px}
+.btn-analyze{padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#0044aa,#00c8ff);color:#fff;font-family:‘Cairo’,sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 22px rgba(0,200,255,.3);transition:all .22s;flex:1}
+.btn-analyze:active{transform:scale(.97)}
+.btn-analyze:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-refresh{padding:14px 16px;border:1px solid var(–border);border-radius:12px;background:var(–card);color:var(–accent);font-size:1.1rem;cursor:pointer;transition:all .2s}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-left:4px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* CONSENSUS - فكرة 7 */
+.consensus{display:none;align-items:center;gap:10px;border-radius:12px;padding:11px 14px;margin-bottom:11px;border:1px solid}
+.consensus.show{display:flex}
+.consensus.call{background:rgba(0,232,122,.06);border-color:rgba(0,232,122,.3)}
+.consensus.put{background:rgba(255,45,85,.06);border-color:rgba(255,45,85,.3)}
+.con-icon{font-size:1.4rem;flex-shrink:0}
+.con-t{font-weight:700;font-size:.8rem}
+.con-t.call{color:var(–green)}.con-t.put{color:var(–red)}
+.con-s{font-size:.6rem;color:var(–muted);margin-top:2px}
+.con-tfs{display:flex;gap:4px;margin-top:5px}
+.con-tf{font-size:.55rem;padding:2px 7px;border-radius:10px;font-weight:700}
+.con-tf.call{background:rgba(0,232,122,.12);color:var(–green)}
+.con-tf.put{background:rgba(255,45,85,.12);color:var(–red)}
+
+/* SIGNAL CARD */
+.sig-card{background:var(–card);border:1px solid var(–border);border-radius:13px;overflow:hidden;margin-bottom:11px;transition:all .35s}
+.sig-card.call{border-color:var(–green);box-shadow:0 0 25px rgba(0,232,122,.14)}
+.sig-card.put{border-color:var(–red);box-shadow:0 0 25px rgba(255,45,85,.14)}
+.sig-card.diamond{border-color:var(–diamond);box-shadow:0 0 35px rgba(179,136,255,.25)}
+.sig-top{padding:18px 16px 14px;text-align:center;border-bottom:1px solid var(–border)}
+.sig-pair{font-family:‘Share Tech Mono’,monospace;font-size:.58rem;color:var(–muted);letter-spacing:3px;margin-bottom:5px}
+.sig-arrow{font-size:2.6rem;line-height:1;margin-bottom:2px}
+.sig-dir{font-family:‘Share Tech Mono’,monospace;font-size:1.55rem;font-weight:900;letter-spacing:3px}
+.sig-dir.call{color:var(–green);text-shadow:0 0 18px rgba(0,232,122,.45)}
+.sig-dir.put{color:var(–red);text-shadow:0 0 18px rgba(255,45,85,.45)}
+.sig-dir.diamond-dir{color:var(–diamond);text-shadow:0 0 18px rgba(179,136,255,.6)}
+.sig-dir.wait{color:var(–muted)}
+.sig-str{font-size:.7rem;font-weight:700;margin-top:4px}
+.sc{color:var(–green)}.wc{color:#66cc99}.spu{color:var(–red)}.wp{color:#cc6677}.sw{color:var(–muted)}.dm{color:var(–diamond)}
+.sig-tf{display:inline-block;margin-top:6px;background:rgba(0,200,255,.07);border:1px solid rgba(0,200,255,.13);border-radius:20px;padding:2px 11px;font-size:.63rem;color:var(–accent);font-family:‘Share Tech Mono’,monospace}
+.sig-sub{font-size:.63rem;color:var(–muted);margin-top:3px}
+.entry-info{margin-top:7px;background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.12);border-radius:8px;padding:6px 10px;font-size:.62rem}
+.entry-price{font-family:‘Share Tech Mono’,monospace;color:var(–accent);font-weight:700}
+.conf-sec{padding:11px 16px 3px;display:none}
+.conf-row{display:flex;justify-content:space-between;font-size:.63rem;color:var(–muted);margin-bottom:4px}
+.conf-pct{color:var(–accent);font-weight:700;font-family:‘Share Tech Mono’,monospace}
+.conf-bar{height:5px;border-radius:3px;background:var(–border);overflow:hidden}
+.conf-fill{height:100%;border-radius:3px;width:0;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.cfh{background:linear-gradient(90deg,#009944,#00e87a)}
+.cfm{background:linear-gradient(90deg,#996600,#ffc300)}
+.cfl{background:linear-gradient(90deg,#770022,#ff2d55)}
+.cfd{background:linear-gradient(90deg,#6a1b9a,#b388ff)}
+.tags{display:flex;flex-wrap:wrap;gap:4px;padding:9px 16px 13px}
+.tag{padding:2px 8px;border-radius:14px;font-size:.6rem;font-weight:700;border:1px solid}
+.tb{background:rgba(0,232,122,.06);border-color:rgba(0,232,122,.18);color:var(–green)}
+.tr{background:rgba(255,45,85,.06);border-color:rgba(255,45,85,.18);color:var(–red)}
+.tn{background:rgba(0,200,255,.06);border-color:rgba(0,200,255,.13);color:var(–accent)}
+.td{background:rgba(179,136,255,.06);border-color:rgba(179,136,255,.18);color:var(–diamond)}
+
+/* PATTERN */
+.pat{display:none;align-items:center;gap:8px;background:rgba(255,195,0,.04);border:1px solid rgba(255,195,0,.18);border-radius:9px;padding:8px 12px;margin-bottom:11px}
+.pat.show{display:flex}
+.pn{color:var(–yellow);font-weight:700;font-size:.73rem}
+.pd{color:var(–muted);font-size:.6rem;margin-top:1px}
+
+/* TIMER */
+.timer{background:var(–card);border:1px solid var(–border);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:11px;margin-bottom:11px;transition:border-color .3s}
+.timer.on{border-color:rgba(255,195,0,.35);box-shadow:0 0 14px rgba(255,195,0,.1)}
+.tb2{flex:1}
+.tl{font-size:.57rem;color:var(–muted);margin-bottom:2px}
+.tv2{font-family:‘Share Tech Mono’,monospace;font-size:1.08rem;color:var(–yellow);letter-spacing:3px}
+.tbar{height:2px;border-radius:2px;background:var(–border);margin-top:4px;overflow:hidden}
+.tfill{height:100%;background:linear-gradient(90deg,var(–yellow),var(–orange));border-radius:2px;transition:width 1s linear}
+.ttf{text-align:center;font-size:.57rem;color:var(–muted);line-height:1.5}
+.ttf span{display:block;font-family:‘Share Tech Mono’,monospace;font-size:.72rem;color:var(–accent)}
+
+/* CHART */
+.chart-card{background:var(–card);border:1px solid var(–border);border-radius:11px;overflow:hidden;margin-bottom:11px}
+.chart-hdr{padding:8px 13px;border-bottom:1px solid var(–border);display:flex;justify-content:space-between;align-items:center}
+.chart-lbl{font-size:.6rem;color:var(–muted)}
+.chart-pw{text-align:left;font-family:‘Share Tech Mono’,monospace}
+.chart-p{font-size:.88rem;color:var(–accent)}
+.chart-chg{font-size:.57rem}
+.cu{color:var(–green)}.cd{color:var(–red)}
+
+/* INDICATORS */
+.sh{display:flex;align-items:center;gap:6px;font-size:.57rem;letter-spacing:1.8px;text-transform:uppercase;color:var(–muted);margin-bottom:7px}
+.sh::before{content:’’;width:2px;height:10px;background:var(–accent);border-radius:2px;box-shadow:0 0 6px rgba(0,200,255,.4)}
+.ind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:11px}
+.ind{background:var(–card);border:1px solid var(–border);border-radius:8px;padding:8px 4px;text-align:center;transition:border-color .3s}
+.ind.bull{border-color:rgba(0,232,122,.25)}.ind.bear{border-color:rgba(255,45,85,.25)}
+.in{font-size:.5rem;color:var(–muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.iv{font-family:‘Share Tech Mono’,monospace;font-size:.76rem;font-weight:700}
+.iv.bull{color:var(–green)}.iv.bear{color:var(–red)}.iv.neut{color:var(–yellow)}
+.is{font-size:.5rem;color:var(–muted);margin-top:1px}
+
+/* HISTORY */
+.hist-list{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+.hi{background:var(–card);border:1px solid var(–border);border-radius:7px;padding:7px 11px;display:flex;justify-content:space-between;align-items:center;border-right:3px solid transparent}
+.hi.call{border-right-color:var(–green)}.hi.put{border-right-color:var(–red)}
+.hd{font-family:‘Share Tech Mono’,monospace;font-weight:700;font-size:.68rem}
+.hd.call{color:var(–green)}.hd.put{color:var(–red)}
+.hc{color:var(–accent);font-family:‘Share Tech Mono’,monospace;font-size:.68rem}
+.ht{color:var(–orange);font-size:.58rem}
+.hm{color:var(–muted);font-size:.58rem}
+.no-hist{text-align:center;color:var(–muted);padding:14px;font-size:.7rem}
+
+footer{text-align:center;font-size:.57rem;color:var(–muted);line-height:2;border-top:1px solid var(–border);padding-top:10px;margin-top:5px}
+</style>
+
+</head>
+<body>
+<div class="app">
+
+<div class="hdr">
+  <div class="chip"><span class="dot"></span> REAL MARKET • LIVE</div>
+  <h1>🎯 SNIPER PRO</h1>
+  <div class="hdr-sub">EUR/USD • إشارات حقيقية 100% • Expert Option</div>
+  <div class="clk-row">
+    <div class="clk" id="clk">--:--:--</div>
+    <div class="tz">توقيت السعودية</div>
+  </div>
+</div>
+
+<!-- PRICE -->
+
+<div class="price-card">
+  <div>
+    <div class="pc-label">EUR / USD • سعر حقيقي</div>
+    <div class="pc-price" id="pcPrice">جاري...</div>
+    <div class="pc-chg" id="pcChg"></div>
+  </div>
+  <div class="pc-right">
+    <div class="pc-status">حالة الاتصال <span class="pc-dot" id="pcDot"></span></div>
+    <div class="pc-updated" id="pcUpdated">--:--</div>
+  </div>
+</div>
+
+<!-- MARKET TEMP - فكرة 3 -->
+
+<div class="mtemp">
+  <div class="mtemp-hdr">
+    <div class="mtemp-lbl">🌡️ حرارة السوق</div>
+    <div class="mtemp-val" id="mtempVal">--</div>
+  </div>
+  <div class="mtemp-bar">
+    <div class="mtemp-fill" id="mtempFill" style="width:0%"></div>
+  </div>
+  <div class="mtemp-labels"><span>هادي</span><span>معتدل</span><span>متقلب</span></div>
+  <div class="mtemp-status" id="mtempStatus">جاري القياس...</div>
+</div>
+
+<!-- SNIPER MODE - فكرة 2 -->
+
+<div class="sniper-mode">
+  <div class="sniper-info">
+    <div class="sniper-lbl">👁️ وضع القناص التلقائي</div>
+    <div class="sniper-sub" id="sniperSub">يراقب ويصرخ لما تطلع إشارة مؤكدة</div>
+  </div>
+  <button class="sniper-btn off" id="sniperBtn" onclick="toggleSniper()">تفعيل</button>
+</div>
+
+<!-- SESSIONS -->
+
+<div class="slbl">حالة الأسواق العالمية</div>
+<div class="sess" id="sess"></div>
+<div class="mkt" id="mkt">
+  <div class="mi" id="mi">⏳</div>
+  <div><span class="mm" id="mm">جاري التحقق...</span><span class="ms" id="ms"></span></div>
+</div>
+
+<!-- QUIET WARNING - فكرة 13 -->
+
+<div class="quiet-warn" id="quietWarn">
+  <div class="qw-i">😴</div>
+  <div class="qw-t">⚠️ السوق هادي جداً — لا تتداول</div>
+  <div class="qw-s">التقلب منخفض — الإشارات غير موثوقة الآن<br>انتظر حتى يتحرك السوق</div>
+</div>
+
+<!-- BLOCKER -->
+
+<div class="blocker" id="blocker">
+  <div class="bl-i">🔒</div>
+  <div class="bl-t">السوق الحقيقي مغلق</div>
+  <div class="bl-s">EUR/USD يتداول فقط في السوق الحقيقي<br>لا تتداول OTC — نتائجها غير موثوقة</div>
+  <div class="bl-n" id="blN"></div>
+</div>
+
+<!-- TF -->
+
+<div class="tf-row">
+  <div class="tf-pill active" onclick="setTF('1',this)">1 دقيقة</div>
+  <div class="tf-pill" onclick="setTF('2',this)">2 دقيقة</div>
+  <div class="tf-pill" onclick="setTF('5',this)">5 دقائق</div>
+</div>
+
+<!-- BTNS -->
+
+<div class="btn-row">
+  <button class="btn-analyze" id="analyzeBtn" onclick="analyze()">🎯 قنّص الآن — تحليل EUR/USD</button>
+  <button class="btn-refresh" onclick="location.reload()" title="تحديث">🔄</button>
+</div>
+
+<!-- CONSENSUS - فكرة 7 -->
+
+<div class="consensus" id="consensus">
+  <div class="con-icon" id="conIcon">🔥</div>
+  <div>
+    <div class="con-t" id="conT">إجماع كامل</div>
+    <div class="con-s" id="conS">كل الإطارات الزمنية متفقة</div>
+    <div class="con-tfs" id="conTFs"></div>
+  </div>
+</div>
+
+<!-- SIGNAL CARD -->
+
+<div class="sig-card" id="sigCard">
+  <div class="sig-top">
+    <div class="sig-pair">EUR / USD • SNIPER PRO ULTIMATE</div>
+    <div class="sig-arrow" id="sigArrow">🎯</div>
+    <div class="sig-dir wait" id="sigDir">اضغط قنّص</div>
+    <div class="sig-str sw" id="sigStr">—</div>
+    <div class="sig-tf" id="sigTF" style="display:none">—</div>
+    <div class="entry-info" id="entryInfo" style="display:none">
+      <span style="color:var(--muted);font-size:.58rem">نقطة الدخول: </span>
+      <span class="entry-price" id="entryPrice">--</span>
+      <span style="color:var(--muted);font-size:.55rem;margin-right:8px"> • ادخل Expert Option: </span>
+      <span class="entry-price" id="entryTF">--</span>
+    </div>
+    <div class="sig-sub" id="sigSub">سيتم تحليل السوق الحقيقي وإعطاؤك توصية دقيقة</div>
+  </div>
+  <div class="conf-sec" id="confSec">
+    <div class="conf-row"><span>قوة الإشارة</span><span class="conf-pct" id="confPct">0%</span></div>
+    <div class="conf-bar"><div class="conf-fill cfh" id="confFill"></div></div>
+  </div>
+  <div class="tags" id="tags"></div>
+</div>
+
+<!-- PATTERN -->
+
+<div class="pat" id="pat">
+  <span style="font-size:1rem">🕯️</span>
+  <div><div class="pn" id="pn"></div><div class="pd" id="pd"></div></div>
+</div>
+
+<!-- TIMER -->
+
+<div class="timer" id="timer">
+  <div style="font-size:1.1rem">⏱</div>
+  <div class="tb2">
+    <div class="tl">ادخل الصفقة في Expert Option</div>
+    <div class="tv2" id="tVal">--:--</div>
+    <div class="tbar"><div class="tfill" id="tFill" style="width:0%"></div></div>
+  </div>
+  <div class="ttf">الإطار<span id="tTF">—</span></div>
+</div>
+
+<!-- CHART -->
+
+<div class="chart-card">
+  <div class="chart-hdr">
+    <div class="chart-lbl">EUR/USD • TradingView مباشر</div>
+    <div class="chart-pw">
+      <div class="chart-chg" id="chartChg"></div>
+      <div class="chart-p" id="chartP">--</div>
+    </div>
+  </div>
+  <div id="tradingview-widget"></div>
+</div>
+
+<!-- INDICATORS -->
+
+<div class="sh">المؤشرات الفنية — بيانات حقيقية</div>
+<div class="ind-grid">
+  <div class="ind" id="ci-rsi"><div class="in">RSI 14</div><div class="iv neut" id="vi-rsi">--</div><div class="is" id="si-rsi">--</div></div>
+  <div class="ind" id="ci-macd"><div class="in">MACD</div><div class="iv neut" id="vi-macd">--</div><div class="is" id="si-macd">--</div></div>
+  <div class="ind" id="ci-stoch"><div class="in">Stoch</div><div class="iv neut" id="vi-stoch">--</div><div class="is" id="si-stoch">--</div></div>
+  <div class="ind" id="ci-ema9"><div class="in">EMA 9</div><div class="iv neut" id="vi-ema9">--</div><div class="is" id="si-ema9">--</div></div>
+  <div class="ind" id="ci-ema21"><div class="in">EMA 21</div><div class="iv neut" id="vi-ema21">--</div><div class="is" id="si-ema21">--</div></div>
+  <div class="ind" id="ci-bb"><div class="in">BB %</div><div class="iv neut" id="vi-bb">--</div><div class="is" id="si-bb">--</div></div>
+</div>
+
+<!-- HISTORY -->
+
+<div class="sh">آخر التوصيات</div>
+<div id="hist"><div class="no-hist">اضغط قنّص لبدء الإشارات 🎯</div></div>
+
+<footer>Sniper Pro Ultimate • EUR/USD • بيانات حقيقية 100%<br>ريد ون 🔴 × عتيق • التداول ينطوي على مخاطر</footer>
+</div>
+
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+<script>
+new TradingView.widget({
+  "width":"100%","height":260,"symbol":"FX:EURUSD","interval":"1",
+  "timezone":"Asia/Riyadh","theme":"dark","style":"1","locale":"ar",
+  "hide_top_toolbar":true,"hide_legend":true,"save_image":false,
+  "container_id":"tradingview-widget"
+});
+
+const API_KEY='a16e72269b854e348b1adc5a3e8c3387';
+const PROXY='https://corsproxy.io/?';
+let candles=[],currentTF='1',timerInt=null,histArr=[],sniperInt=null,sniperOn=false;
+let tfResults={};// فكرة 7 — نتائج كل إطار
+
+// ── SOUNDS ──
+function playAlert(dir){
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const t=dir==='CALL'?[[523,0],[659,.15],[784,.3]]:[[784,0],[659,.15],[523,.3]];
+  t.forEach(([f,d])=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.4,ctx.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.3);o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+.3);});}catch(e){}
+}
+function playConfirmed(dir){
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const t=dir==='CALL'?[[400,0],[500,.12],[650,.24],[800,.36],[1000,.48]]:[[1000,0],[800,.12],[650,.24],[500,.36],[400,.48]];
+  t.forEach(([f,d])=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='square';g.gain.setValueAtTime(.5,ctx.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.2);o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+.25);});
+  const o2=ctx.createOscillator(),g2=ctx.createGain();o2.connect(g2);g2.connect(ctx.destination);o2.frequency.value=dir==='CALL'?1200:300;o2.type='sine';g2.gain.setValueAtTime(.6,ctx.currentTime+.7);g2.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+1.4);o2.start(ctx.currentTime+.7);o2.stop(ctx.currentTime+1.5);}catch(e){}
+}
+function playDiamond(){
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();
+  [[300,0],[600,.1],[900,.2],[1200,.3],[1500,.4],[1800,.5],[1200,.7],[1800,.9]].forEach(([f,d])=>{
+    const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.6,ctx.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.25);o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+.3);});}catch(e){}
+}
+
+// ── FETCH ──
+async function fetchPrices(){
+  const map={'1':'1min','2':'2min','5':'5min'};
+  try{
+    const url=`https://api.twelvedata.com/time_series?symbol=EUR/USD&interval=${map[currentTF]}&outputsize=120&apikey=${API_KEY}`;
+    const r=await fetch(PROXY+encodeURIComponent(url));
+    const d=await r.json();
+    if(!d.values){setConnErr();return false;}
+    candles=d.values.reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
+    const last=candles[candles.length-1],prev=candles[candles.length-10]||candles[0];
+    const chg=((last.c-prev.c)/prev.c*100);
+    document.getElementById('pcPrice').textContent=last.c.toFixed(5);
+    const ce=document.getElementById('pcChg');ce.textContent=(chg>=0?'▲ +':'▼ ')+chg.toFixed(4)+'%';ce.className='pc-chg '+(chg>=0?'up':'dn');
+    document.getElementById('pcDot').className='pc-dot live';
+    document.getElementById('pcUpdated').textContent=new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+    updateChartPrice();updateMarketTemp();return true;
+  }catch(e){setConnErr();return false;}
+}
+function setConnErr(){document.getElementById('pcDot').className='pc-dot err';document.getElementById('pcUpdated').textContent='خطأ';}
+
+// ── MARKET TEMP - فكرة 3 ──
+function updateMarketTemp(){
+  if(candles.length<20)return;
+  const recent=candles.slice(-20);
+  const ranges=recent.map(c=>c.h-c.l);
+  const avgRange=ranges.reduce((a,b)=>a+b)/ranges.length;
+  const temp=Math.min(100,Math.round(avgRange/0.0008*50));
+  const fill=document.getElementById('mtempFill');
+  const val=document.getElementById('mtempVal');
+  const status=document.getElementById('mtempStatus');
+  const quiet=document.getElementById('quietWarn');
+  fill.style.width=temp+'%';
+  fill.style.background=temp<30?'linear-gradient(90deg,#00e87a,#00c8ff)':temp<60?'linear-gradient(90deg,#ffc300,#ff8c00)':'linear-gradient(90deg,#ff8c00,#ff2d55)';
+  val.textContent=temp+'/100';
+  val.style.color=temp<30?'var(--green)':temp<60?'var(--yellow)':'var(--red)';
+  if(temp<25){status.textContent='😴 السوق هادي — لا تتداول';status.style.color='var(--orange)';quiet.classList.add('show');}
+  else if(temp<60){status.textContent='✅ السوق معتدل — مناسب للتداول';status.style.color='var(--green)';quiet.classList.remove('show');}
+  else{status.textContent='⚡ السوق متقلب — فرص قوية';status.style.color='var(--red)';quiet.classList.remove('show');}
+  return temp;
+}
+
+// ── SNIPER MODE - فكرة 2 ──
+function toggleSniper(){
+  sniperOn=!sniperOn;
+  const btn=document.getElementById('sniperBtn');
+  const sub=document.getElementById('sniperSub');
+  if(sniperOn){
+    btn.textContent='إيقاف';btn.className='sniper-btn on';
+    sub.textContent='🔴 يراقب الآن — كل 30 ثانية';
+    sniperInt=setInterval(sniperWatch,30000);
+    sniperWatch();
+  } else {
+    btn.textContent='تفعيل';btn.className='sniper-btn off';
+    sub.textContent='يراقب ويصرخ لما تطلع إشارة مؤكدة';
+    clearInterval(sniperInt);
+  }
+}
+async function sniperWatch(){
+  if(!realOpen())return;
+  const ok=await fetchPrices();
+  if(!ok)return;
+  const sig=strategy();
+  if(sig&&sig.confirmed){
+    if(sig.diamond) playDiamond();
+    else playConfirmed(sig.dir);
+    updateInd(sig);showSig(sig);showPat(sig.pat);addHist(sig);startTimer(sig.tf,sig.tfL);
+  }
+}
+
+// ── CONSENSUS - فكرة 7 ──
+async function checkConsensus(){
+  const tfs=['1','2','5'];const results=[];
+  for(const tf of tfs){
+    const map={'1':'1min','2':'2min','5':'5min'};
+    try{
+      const url=`https://api.twelvedata.com/time_series?symbol=EUR/USD&interval=${map[tf]}&outputsize=50&apikey=${API_KEY}`;
+      const r=await fetch(PROXY+encodeURIComponent(url));
+      const d=await r.json();
+      if(!d.values)continue;
+      const c=d.values.reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
+      const cl=c.map(x=>x.c);
+      const rsi=I.rsi(cl),macdV=I.macd(cl),e9=I.ema(cl,9),e21=I.ema(cl,21);
+      const dir=rsi<45&&macdV>0&&e9>e21?'CALL':rsi>55&&macdV<0&&e9<e21?'PUT':null;
+      if(dir)results.push({tf,dir});
+    }catch(e){}
+  }
+  const el=document.getElementById('consensus');
+  if(results.length===3&&results.every(r=>r.dir===results[0].dir)){
+    const dir=results[0].dir;
+    el.className='consensus show '+(dir==='CALL'?'call':'put');
+    document.getElementById('conIcon').textContent=dir==='CALL'?'🟢':'🔴';
+    document.getElementById('conT').textContent=dir==='CALL'?'🟢 إجماع كامل — شراء':'🔴 إجماع كامل — بيع';
+    document.getElementById('conT').className='con-t '+(dir==='CALL'?'call':'put');
+    document.getElementById('conS').textContent='كل الإطارات 1د + 2د + 5د متفقة — ثقة عالية جداً';
+    document.getElementById('conTFs').innerHTML=results.map(r=>`<span class="con-tf ${r.dir.toLowerCase()}">${r.tf}د ✓</span>`).join('');
+    playConfirmed(dir);
+  } else {
+    el.className='consensus';
+  }
+}
+
+// ── SESSIONS ──
+const SD=[{n:'سيدني',f:'🇦🇺',o:21,c:6,w:true},{n:'طوكيو',f:'🇯🇵',o:0,c:9,w:false},{n:'لندن',f:'🇬🇧',o:7,c:16,w:false},{n:'نيويورك',f:'🇺🇸',o:12,c:21,w:false}];
+function isOpen(s,h,m){const n=h*60+m;if(s.w){const a=n<s.o*60?n+1440:n;return a>=s.o*60&&a<s.c*60+1440;}return n>=s.o*60&&n<s.c*60;}
+function realOpen(){const n=new Date(),d=n.getUTCDay(),h=n.getUTCHours(),m=n.getUTCMinutes();if(d===0||d===6||(d===5&&h>=21))return false;return isOpen(SD[2],h,m)||isOpen(SD[3],h,m);}
+function nextOpen(){const n=new Date(),d=n.getUTCDay(),h=n.getUTCHours();if(d===0||d===6||(d===5&&h>=21))return'السوق يفتح الاثنين 10:00 ص';if(h<7)return'لندن تفتح 10:00 ص (توقيت السعودية)';return'نيويورك مفتوحة حتى 00:00';}
+function renderSessions(){
+  const n=new Date(),h=n.getUTCHours(),m=n.getUTCMinutes(),ov=h*60+m>=12*60&&h*60+m<16*60;
+  document.getElementById('sess').innerHTML=SD.map(s=>{const op=isOpen(s,h,m),best=op&&(s.n==='لندن'||s.n==='نيويورك')&&ov;const cls=best?'best':op?'open':'';const pt=best?'⭐ BEST':op?'مفتوح':'مغلق';const pc=best?'best':op?'open':'closed';return`<div class="s ${cls}"><div class="sf">${s.f}</div><div class="sn">${s.n}</div><span class="sp ${pc}">${pt}</span>${best?'<span class="ov">تداخل ⚡</span>':''}</div>`;}).join('');
+  const lon=isOpen(SD[2],h,m),ny=isOpen(SD[3],h,m),ro=realOpen();
+  const b=document.getElementById('mkt');
+  if(ov&&lon&&ny){b.className='mkt hot';document.getElementById('mi').textContent='🔥';document.getElementById('mm').textContent='🔥 تداخل لندن × نيويورك — أفضل وقت';document.getElementById('ms').textContent='أعلى سيولة • إشارات أقوى وأدق';}
+  else if(lon&&ro){b.className='mkt ok';document.getElementById('mi').textContent='✅';document.getElementById('mm').textContent='جلسة لندن مفتوحة — وقت جيد';document.getElementById('ms').textContent='EUR/USD نشط — إشارات موثوقة';}
+  else if(ny&&ro){b.className='mkt ok';document.getElementById('mi').textContent='✅';document.getElementById('mm').textContent='جلسة نيويورك مفتوحة';document.getElementById('ms').textContent='حركة جيدة على EUR/USD';}
+  else{b.className='mkt off';document.getElementById('mi').textContent='⛔';document.getElementById('mm').textContent='السوق الحقيقي مغلق';document.getElementById('ms').textContent='انتظر جلسة لندن أو نيويورك';}
+  const blk=document.getElementById('blocker'),btn=document.getElementById('analyzeBtn');
+  if(!ro){blk.classList.add('show');btn.disabled=true;document.getElementById('blN').textContent=nextOpen();}
+  else{blk.classList.remove('show');btn.disabled=false;}
+}
+
+function setTF(tf,el){currentTF=tf;document.querySelectorAll('.tf-pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');fetchPrices();}
+
+// ── INDICATORS ──
+const I={
+  ema(a,p){if(a.length<p)return a[a.length-1]||0;const k=2/(p+1);let e=a.slice(0,p).reduce((x,y)=>x+y)/p;for(let i=p;i<a.length;i++)e=a[i]*k+e*(1-k);return+e.toFixed(5);},
+  rsi(a,p=14){if(a.length<p+1)return 50;let g=0,l=0;for(let i=a.length-p;i<a.length;i++){const d=a[i]-a[i-1];d>0?g+=d:l-=d;}return+(100-100/(1+g/p/(l/p||1e-9))).toFixed(2);},
+  macd(a){return+(this.ema(a,12)-this.ema(a,26)).toFixed(6);},
+  stoch(c,p=14){if(c.length<p)return 50;const s=c.slice(-p),hh=Math.max(...s.map(x=>x.h)),ll=Math.min(...s.map(x=>x.l));return+((c[c.length-1].c-ll)/(hh-ll||1e-9)*100).toFixed(2);},
+  bb(a,p=20){if(a.length<p)return 0.5;const s=a.slice(-p),m=s.reduce((x,y)=>x+y)/p,sd=Math.sqrt(s.map(x=>(x-m)**2).reduce((x,y)=>x+y)/p),cur=a[a.length-1];return+((cur-(m-2*sd))/(4*sd||1e-9)).toFixed(3);},
+  atr(c,p=14){if(c.length<p+1)return 0;const trs=c.slice(-p).map((x,i,a)=>i===0?x.h-x.l:Math.max(x.h-x.l,Math.abs(x.h-a[i-1].c),Math.abs(x.l-a[i-1].c)));return trs.reduce((a,b)=>a+b)/p;}
+};
+
+// ── PATTERNS ──
+function getPattern(c){
+  if(c.length<3)return null;
+  const[c2,c1,c0]=c.slice(-3);
+  const bd=x=>Math.abs(x.c-x.o),rn=x=>x.h-x.l||1e-9,bu=x=>x.c>x.o,be=x=>x.c<x.o,dj=x=>bd(x)/rn(x)<0.12;
+  const lw=x=>Math.min(x.o,x.c)-x.l,uw=x=>x.h-Math.max(x.o,x.c);
+  if(dj(c0))return{n:'دوجي',d:bu(c1)?'PUT':'CALL',ds:'تردد السوق — انعكاس محتمل',s:2};
+  if(be(c1)&&bu(c0)&&c0.o<c1.c&&c0.c>c1.o)return{n:'ابتلاع صعودي',d:'CALL',ds:'انعكاس صعودي قوي ✅',s:3};
+  if(bu(c1)&&be(c0)&&c0.o>c1.c&&c0.c<c1.o)return{n:'ابتلاع هبوطي',d:'PUT',ds:'انعكاس هبوطي قوي ✅',s:3};
+  if(bu(c0)&&lw(c0)>bd(c0)*1.8&&uw(c0)<bd(c0)*0.4)return{n:'مطرقة 🔨',d:'CALL',ds:'ارتداد من الدعم',s:3};
+  if(be(c0)&&uw(c0)>bd(c0)*1.8&&lw(c0)<bd(c0)*0.4)return{n:'نجمة هاوية ⭐',d:'PUT',ds:'رفض المقاومة',s:3};
+  if(bu(c2)&&bu(c1)&&bu(c0)&&c0.c>c1.c&&c1.c>c2.c)return{n:'3 جنود بيض',d:'CALL',ds:'زخم صاعد قوي 🚀',s:4};
+  if(be(c2)&&be(c1)&&be(c0)&&c0.c<c1.c&&c1.c<c2.c)return{n:'3 غربان سود',d:'PUT',ds:'زخم هابط قوي 📉',s:4};
+  if(be(c2)&&dj(c1)&&bu(c0)&&c0.c>(c2.o+c2.c)/2)return{n:'نجمة الصباح',d:'CALL',ds:'انعكاس صعودي مؤكد ✅',s:4};
+  if(bu(c2)&&dj(c1)&&be(c0)&&c0.c<(c2.o+c2.c)/2)return{n:'نجمة المساء',d:'PUT',ds:'انعكاس هبوطي مؤكد ✅',s:4};
+  return null;
+}
+
+// ── QUIET MARKET - فكرة 13 ──
+function isQuietMarket(){
+  if(candles.length<20)return false;
+  const atr=I.atr(candles);
+  return atr<0.00015;
+}
+
+// ── CONFIRMED CHECK - فكرة 11 ──
+function isConfirmed(rsi,macdV,e9,e21,bbV,tr,pat,dir){
+  if(dir==='CALL') return rsi<42&&macdV>0.00003&&e9>e21&&bbV<0.28&&tr!=='down'&&(!pat||pat.d==='CALL');
+  return rsi>58&&macdV<-0.00003&&e9<e21&&bbV>0.72&&tr!=='up'&&(!pat||pat.d==='PUT');
+}
+
+// ── DIAMOND CHECK - فكرة 14 ──
+function isDiamond(rsi,macdV,e9,e21,bbV,stoch,tr,pat,dir){
+  if(dir==='CALL') return rsi<35&&macdV>0.00006&&e9>e21&&bbV<0.15&&stoch<30&&tr!=='down'&&pat&&pat.d==='CALL';
+  return rsi>65&&macdV<-0.00006&&e9<e21&&bbV>0.85&&stoch>70&&tr!=='up'&&pat&&pat.d==='PUT';
+}
+
+// ── STRATEGY ──
+function strategy(){
+  if(candles.length<30)return null;
+  // فكرة 13 — السوق الهادي
+  if(isQuietMarket())return null;
+  const cl=candles.map(x=>x.c),rsi=I.rsi(cl),macdV=I.macd(cl),stoch=I.stoch(candles),e9=I.ema(cl,9),e21=I.ema(cl,21),bbV=I.bb(cl);
+  const l5=cl.slice(-5),tr=l5[4]>l5[0]?'up':l5[4]<l5[0]?'down':'flat';
+  const pat=getPattern(candles);
+  let cs=0,ps=0,cr=[],pr=[];
+  if(rsi<25){cs+=4;cr.push({t:`RSI ${rsi} ذروة بيع حاد`,c:'tb'})}else if(rsi<35){cs+=2;cr.push({t:`RSI ${rsi} ذروة بيع`,c:'tb'})}else if(rsi<42){cs+=1;cr.push({t:`RSI ${rsi} دعم`,c:'tb'})}else if(rsi>75){ps+=4;pr.push({t:`RSI ${rsi} ذروة شراء حاد`,c:'tr'})}else if(rsi>65){ps+=2;pr.push({t:`RSI ${rsi} ذروة شراء`,c:'tr'})}else if(rsi>58){ps+=1;pr.push({t:`RSI ${rsi} مقاومة`,c:'tr'})}
+  if(macdV>0.00012){cs+=3;cr.push({t:'MACD قوي ↑',c:'tb'})}else if(macdV>0.00004){cs+=1;cr.push({t:'MACD إيجابي',c:'tb'})}else if(macdV<-0.00012){ps+=3;pr.push({t:'MACD قوي ↓',c:'tr'})}else if(macdV<-0.00004){ps+=1;pr.push({t:'MACD سلبي',c:'tr'})}
+  if(stoch<15){cs+=3;cr.push({t:`Stoch ${stoch} بيع مفرط`,c:'tb'})}else if(stoch<30){cs+=1;cr.push({t:`Stoch ${stoch} دعم`,c:'tb'})}else if(stoch>85){ps+=3;pr.push({t:`Stoch ${stoch} شراء مفرط`,c:'tr'})}else if(stoch>70){ps+=1;pr.push({t:`Stoch ${stoch} مقاومة`,c:'tr'})}
+  const ed=e9-e21;
+  if(ed>0.0004){cs+=3;cr.push({t:'EMA9 فوق EMA21 بقوة',c:'tb'})}else if(ed>0.0001){cs+=1;cr.push({t:'EMA تقاطع صاعد',c:'tb'})}else if(ed<-0.0004){ps+=3;pr.push({t:'EMA9 تحت EMA21 بقوة',c:'tr'})}else if(ed<-0.0001){ps+=1;pr.push({t:'EMA تقاطع هابط',c:'tr'})}
+  if(bbV<0.08){cs+=3;cr.push({t:'BB حد سفلي — ارتداد',c:'tb'})}else if(bbV<0.22){cs+=1;cr.push({t:'BB منطقة شراء',c:'tb'})}else if(bbV>0.92){ps+=3;pr.push({t:'BB حد علوي — رفض',c:'tr'})}else if(bbV>0.78){ps+=1;pr.push({t:'BB منطقة بيع',c:'tr'})}
+  if(tr==='up'){cs+=1;cr.push({t:'اتجاه صاعد',c:'tb'})}if(tr==='down'){ps+=1;pr.push({t:'اتجاه هابط',c:'tr'})}
+  if(pat){if(pat.d==='CALL'){cs+=pat.s;cr.push({t:`🕯️ ${pat.n}`,c:'tb'})}else{ps+=pat.s;pr.push({t:`🕯️ ${pat.n}`,c:'tr'})}}
+  // فكرة 11 — التأكيد الثلاثي
+  const tfSec=currentTF==='1'?60:currentTF==='2'?120:300;
+  const tfL=currentTF==='1'?'1 دقيقة ⚡':currentTF==='2'?'2 دقيقة':'5 دقائق';
+  const expertTF=currentTF==='1'?'0:45':currentTF==='2'?'1:45':'4:30';
+  const mx=19;
+  if(cs>=6&&cs>ps+2){
+    const conf=Math.min(96,Math.round(56+(cs/mx)*41));
+    const confirmed=isConfirmed(rsi,macdV,e9,e21,bbV,tr,pat,'CALL');
+    const diamond=isDiamond(rsi,macdV,e9,e21,bbV,stoch,tr,pat,'CALL');
+    const st=diamond?'💎 شراء ماسي — نادر وقوي جداً':confirmed?'🟢 شراء مؤكد — كل المؤشرات متوافقة':cs>=14?'🔥 شراء قوي جداً':cs>=9?'✅ شراء قوي':'شراء محتمل';
+    const finalConf=diamond?98:confirmed?Math.min(97,conf+8):conf;
+    const sc=diamond?'dm':confirmed?'sc':cs>=12?'sc':'wc';
+    return{dir:'CALL',conf:finalConf,confirmed,diamond,reasons:cr.slice(0,5),tf:tfSec,tfL,expertTF,st,sc,pat,rsi,macdV,stoch,e9,e21,bbV};
+  }
+  if(ps>=6&&ps>cs+2){
+    const conf=Math.min(96,Math.round(56+(ps/mx)*41));
+    const confirmed=isConfirmed(rsi,macdV,e9,e21,bbV,tr,pat,'PUT');
+    const diamond=isDiamond(rsi,macdV,e9,e21,bbV,stoch,tr,pat,'PUT');
+    const st=diamond?'💎 بيع ماسي — نادر وقوي جداً':confirmed?'🔴 بيع مؤكد — كل المؤشرات متوافقة':ps>=14?'🔥 بيع قوي جداً':ps>=9?'✅ بيع قوي':'بيع محتمل';
+    const finalConf=diamond?98:confirmed?Math.min(97,conf+8):conf;
+    const sc=diamond?'dm':confirmed?'spu':ps>=12?'spu':'wp';
+    return{dir:'PUT',conf:finalConf,confirmed,diamond,reasons:pr.slice(0,5),tf:tfSec,tfL,expertTF,st,sc,pat,rsi,macdV,stoch,e9,e21,bbV};
+  }
+  return null;
+}
+
+// ── ANALYZE ──
+async function analyze(){
+  if(!realOpen()){alert('السوق الحقيقي مغلق.\nانتظر جلسة لندن أو نيويورك.');return;}
+  const btn=document.getElementById('analyzeBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> جاري جلب البيانات...';
+  const ok=await fetchPrices();
+  if(!ok){btn.disabled=false;btn.innerHTML='🎯 قنّص الآن — تحليل EUR/USD';return;}
+  // فكرة 12 — بداية شمعة جديدة
+  const now=new Date(),sec=now.getSeconds();
+  const waitSec=currentTF==='1'?Math.max(0,5-sec):0;
+  setTimeout(async()=>{
+    const sig=strategy();updateInd(sig);
+    if(sig){showSig(sig);showPat(sig.pat);addHist(sig);startTimer(sig.tf,sig.tfL);}
+    else{
+      const quiet=isQuietMarket();
+      noSig(quiet);clrPat();stopTimer();
+    }
+    // فكرة 7 — تحقق من الإجماع
+    checkConsensus();
+    btn.disabled=false;btn.innerHTML='🎯 قنّص الآن — تحليل EUR/USD';
+  },waitSec*1000);
+  if(waitSec>0) btn.innerHTML=`<span class="spin"></span> ينتظر بداية الشمعة (${waitSec}ث)...`;
+}
+
+// ── SIGNAL UI ──
+function showSig(s){
+  const c=document.getElementById('sigCard');
+  c.className='sig-card '+(s.diamond?'diamond':s.dir==='CALL'?'call':'put');
+  document.getElementById('sigArrow').textContent=s.diamond?'💎':s.dir==='CALL'?'📈':'📉';
+  const d=document.getElementById('sigDir');
+  d.textContent=s.dir==='CALL'?'⬆  CALL  شراء':'⬇  PUT  بيع';
+  d.className='sig-dir '+(s.diamond?'diamond-dir':s.dir==='CALL'?'call':'put');
+  const st=document.getElementById('sigStr');st.textContent=s.st;st.className='sig-str '+s.sc;
+  const tf=document.getElementById('sigTF');tf.textContent='⏱ '+s.tfL;tf.style.display='inline-block';
+  // فكرة 6 — نقطة الدخول
+  const ei=document.getElementById('entryInfo');
+  const ep=document.getElementById('entryPrice');
+  const etf=document.getElementById('entryTF');
+  if(candles.length){
+    const last=candles[candles.length-1];
+    ep.textContent=last.c.toFixed(5);
+    etf.textContent=s.expertTF;
+    ei.style.display='block';
+  }
+  document.getElementById('sigSub').textContent=`EUR/USD حقيقي • ${s.tfL} • ادخل الصفقة الآن`;
+  document.getElementById('confSec').style.display='block';
+  document.getElementById('confPct').textContent=s.conf+'%';
+  const f=document.getElementById('confFill');f.style.width=s.conf+'%';
+  f.className='conf-fill '+(s.diamond?'cfd':s.conf>=80?'cfh':s.conf>=65?'cfm':'cfl');
+  document.getElementById('tags').innerHTML=s.reasons.map(r=>`<span class="tag ${r.c}">${r.t}</span>`).join('')+(s.diamond?'<span class="tag td">💎 إشارة ماسية</span>':s.confirmed?'<span class="tag td">✅ تأكيد ثلاثي</span>':'');
+  if(s.diamond) playDiamond();
+  else if(s.confirmed) playConfirmed(s.dir);
+  else if(s.conf>=80) playAlert(s.dir);
+}
+
+function noSig(quiet=false){
+  document.getElementById('sigCard').className='sig-card';
+  document.getElementById('sigArrow').textContent=quiet?'😴':'⏳';
+  const d=document.getElementById('sigDir');d.textContent=quiet?'السوق هادي':'لا توجد إشارة قوية';d.className='sig-dir wait';
+  const st=document.getElementById('sigStr');st.textContent=quiet?'انتظر حركة السوق':'المؤشرات متضاربة — انتظر';st.className='sig-str sw';
+  document.getElementById('sigTF').style.display='none';
+  document.getElementById('entryInfo').style.display='none';
+  document.getElementById('sigSub').textContent='حاول مجدداً بعد دقيقة';
+  document.getElementById('confSec').style.display='none';
+  document.getElementById('tags').innerHTML=`<span class="tag tn">${quiet?'السوق نائم — لا تتداول':'انتظر توافق المؤشرات'}</span>`;
+}
+function showPat(p){const r=document.getElementById('pat');if(!p){r.classList.remove('show');return;}document.getElementById('pn').textContent=p.n;document.getElementById('pd').textContent=p.ds;r.classList.add('show');}
+function clrPat(){document.getElementById('pat').classList.remove('show');}
+
+function updateInd(s){
+  if(!s)return;
+  const{rsi,macdV,stoch,e9,e21,bbV}=s;
+  const set=(id,val,cls,sub)=>{document.getElementById('vi-'+id).textContent=val;document.getElementById('vi-'+id).className='iv '+cls;document.getElementById('si-'+id).textContent=sub;document.getElementById('ci-'+id).className='ind '+(cls==='bull'?'bull':cls==='bear'?'bear':'');};
+  set('rsi',rsi.toFixed(1),rsi<35?'bull':rsi>65?'bear':'neut',rsi<30?'↑ ذروة بيع':rsi>70?'↓ ذروة شراء':'محايد');
+  set('macd',(macdV*10000).toFixed(2),macdV>0?'bull':'bear',macdV>0.0001?'قوة صاعدة':macdV>0?'صاعد':'هابط');
+  set('stoch',stoch.toFixed(1),stoch<25?'bull':stoch>75?'bear':'neut',stoch<20?'بيع مفرط':stoch>80?'شراء مفرط':'محايد');
+  set('ema9',e9.toFixed(5),e9>e21?'bull':'bear',e9>e21?'فوق EMA21':'تحت EMA21');
+  set('ema21',e21.toFixed(5),e9>e21?'bull':'bear',e9>e21?'EMA9 أعلى':'EMA9 أدنى');
+  set('bb',(bbV*100).toFixed(0)+'%',bbV<0.2?'bull':bbV>0.8?'bear':'neut',bbV<0.15?'حد سفلي':bbV>0.85?'حد علوي':'منتصف');
+}
+
+function addHist(s){
+  const entry=candles.length?candles[candles.length-1].c:0;
+  const trade={dir:s.dir,conf:s.conf,tf:s.tfL,st:s.st,entry,time:new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}),timestamp:Date.now(),result:null,diamond:s.diamond,confirmed:s.confirmed};
+  histArr.unshift(trade);if(histArr.length>20)histArr.pop();
+  const checkAfter=s.tf*1000;
+  setTimeout(async()=>{const ok=await fetchPrices();if(!ok||!candles.length)return;const exitPrice=candles[candles.length-1].c;const won=trade.dir==='CALL'?exitPrice>trade.entry:exitPrice<trade.entry;trade.result=won?'win':'loss';renderHist();},checkAfter);
+  renderHist();
+}
+
+function renderHist(){
+  const wins=histArr.filter(h=>h.result==='win').length;
+  const losses=histArr.filter(h=>h.result==='loss').length;
+  const total=wins+losses;
+  const pct=total>0?Math.round(wins/total*100):null;
+  const statsHtml=total>0?`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:.65rem;padding:0 4px"><span style="color:var(--green);font-weight:700">✅ ${wins} ربح</span><span style="color:var(--red);font-weight:700">❌ ${losses} خسارة</span><span style="color:var(--accent);font-weight:700;margin-right:auto">نسبة النجاح: ${pct}%</span></div>`:'';
+  document.getElementById('hist').innerHTML=statsHtml+`<div class="hist-list">${histArr.map(h=>{const res=h.result==='win'?'✅':h.result==='loss'?'❌':'⏳';const badge=h.diamond?'💎':h.confirmed?'🟢':'';return`<div class="hi ${h.dir.toLowerCase()}"><span class="hd ${h.dir.toLowerCase()}">${h.dir==='CALL'?'⬆ CALL':'⬇ PUT'}</span><span style="font-size:.7rem">${badge}</span><span class="hc">${h.conf}%</span><span class="ht">${h.tf}</span><span style="font-size:.75rem">${res}</span><span class="hm">${h.time}</span></div>`;}).join('')}</div>`;
+}
+
+function startTimer(sec,lbl){
+  stopTimer();let rem=sec;
+  const t=document.getElementById('timer'),tv=document.getElementById('tVal'),tf=document.getElementById('tFill'),tl=document.getElementById('tTF');
+  t.classList.add('on');tl.textContent=lbl;
+  const tick=()=>{const m=Math.floor(rem/60),s=rem%60;tv.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;tf.style.width=((rem/sec)*100)+'%';if(rem<=0){stopTimer();return;}rem--;};
+  tick();timerInt=setInterval(tick,1000);
+}
+function stopTimer(){if(timerInt)clearInterval(timerInt);document.getElementById('timer').classList.remove('on');document.getElementById('tVal').textContent='--:--';document.getElementById('tFill').style.width='0%';}
+
+function updateChartPrice(){
+  if(!candles.length)return;
+  const last=candles[candles.length-1],prev=candles[candles.length-10]||candles[0];
+  const chg=((last.c-prev.c)/prev.c*100);
+  document.getElementById('chartP').textContent=last.c.toFixed(5);
+  const ce=document.getElementById('chartChg');ce.textContent=(chg>=0?'+':'')+chg.toFixed(4)+'% ';ce.className='chart-chg '+(chg>=0?'cu':'cd');
+}
+
+function updateClock(){
+  const n=new Date(),k=new Date(n.getTime()+3*3600000);
+  document.getElementById('clk').textContent=`${String(k.getUTCHours()).padStart(2,'0')}:${String(k.getUTCMinutes()).padStart(2,'0')}:${String(k.getUTCSeconds()).padStart(2,'0')}`;
+}
+
+updateClock();setInterval(updateClock,1000);
+renderSessions();setInterval(renderSessions,30000);
+fetchPrices();setInterval(fetchPrices,60000);
+</script>
+
+</body>
+</html>
