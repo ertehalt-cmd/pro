@@ -411,8 +411,24 @@ new TradingView.widget({
 });
 
 const API_KEY='a16e72269b854e348b1adc5a3e8c3387';
-const PROXIES=['https://corsproxy.io/?','https://api.allorigins.win/raw?url=','https://corsproxy.org/?'];
-async function fetchWithProxy(url){for(const proxy of PROXIES){try{const r=await fetch(proxy+encodeURIComponent(url));const d=await r.json();if(d&&d.values)return d;}catch(e1){try{const r2=await fetch(proxy+url);const d2=await r2.json();if(d2&&d2.values)return d2;}catch(e2){continue;}}}return null;}
+async function fetchWithProxy(url){
+  const proxies=[
+    u=>'https://corsproxy.io/?'+encodeURIComponent(u),
+    u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+    u=>'https://corsproxy.org/?'+encodeURIComponent(u),
+    u=>'https://cors-anywhere.herokuapp.com/'+u,
+    u=>u
+  ];
+  for(const pFn of proxies){
+    try{
+      const r=await fetch(pFn(url),{headers:{'X-Requested-With':'XMLHttpRequest'}});
+      if(!r.ok)continue;
+      const d=await r.json();
+      if(d&&d.values&&d.values.length>0)return d;
+    }catch(e){continue;}
+  }
+  return null;
+}
 let candles=[],currentTF='1',timerInt=null,histArr=[],sniperInt=null,sniperOn=false;
 let tfResults={};// فكرة 7 — نتائج كل إطار
 
