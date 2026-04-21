@@ -512,8 +512,8 @@ async function checkConsensus(){
       const url=`https://api.twelvedata.com/time_series?symbol=EUR/USD&interval=${map[tf]}&outputsize=50&apikey=${API_KEY}`;
       const d2=await fetchWithProxy(url);if(!d2){setConnErr();return false;}
       
-      if(!d.values)continue;
-      const c=d.values.reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
+      if(!d2.values)continue;
+      const c=d2.values.reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
       const cl=c.map(x=>x.c);
       const rsi=I.rsi(cl),macdV=I.macd(cl),e9=I.ema(cl,9),e21=I.ema(cl,21);
       const dir=rsi<45&&macdV>0&&e9>e21?'CALL':rsi>55&&macdV<0&&e9<e21?'PUT':null;
