@@ -411,7 +411,8 @@ new TradingView.widget({
 });
 
 const API_KEY='a16e72269b854e348b1adc5a3e8c3387';
-const PROXY='https://corsproxy.io/?';
+const PROXIES=['https://corsproxy.io/?','https://api.allorigins.win/raw?url=','https://corsproxy.org/?'];
+async function fetchWithProxy(url){for(const proxy of PROXIES){try{const r=await fetch(proxy+encodeURIComponent(url));const d=await r.json();if(d&&d.values)return d;}catch(e){continue;}}return null;}
 let candles=[],currentTF='1',timerInt=null,histArr=[],sniperInt=null,sniperOn=false;
 let tfResults={};// فكرة 7 — نتائج كل إطار
 
@@ -438,10 +439,10 @@ async function fetchPrices(){
   const map={'1':'1min','2':'2min','5':'5min'};
   try{
     const url=`https://api.twelvedata.com/time_series?symbol=EUR/USD&interval=${map[currentTF]}&outputsize=120&apikey=${API_KEY}`;
-    const r=await fetch(PROXY+encodeURIComponent(url));
-    const d=await r.json();
-    if(!d.values){setConnErr();return false;}
-    candles=d.values.reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
+    const d2=await fetchWithProxy(url);if(!d2){setConnErr();return false;}
+    
+    if(!d2.values){setConnErr();return false;}
+    candles=d2.values.reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
     const last=candles[candles.length-1],prev=candles[candles.length-10]||candles[0];
     const chg=((last.c-prev.c)/prev.c*100);
     document.getElementById('pcPrice').textContent=last.c.toFixed(5);
@@ -509,8 +510,8 @@ async function checkConsensus(){
     const map={'1':'1min','2':'2min','5':'5min'};
     try{
       const url=`https://api.twelvedata.com/time_series?symbol=EUR/USD&interval=${map[tf]}&outputsize=50&apikey=${API_KEY}`;
-      const r=await fetch(PROXY+encodeURIComponent(url));
-      const d=await r.json();
+      const d2=await fetchWithProxy(url);if(!d2){setConnErr();return false;}
+      
       if(!d.values)continue;
       const c=d.values.reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
       const cl=c.map(x=>x.c);
@@ -771,3 +772,5 @@ renderSessions();setInterval(renderSessions,30000);
 fetchPrices();setInterval(fetchPrices,60000);
 </script>
 
+</body>
+</html>
