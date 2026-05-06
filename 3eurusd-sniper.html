@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>EUR/USD Sniper</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a0a14;
+    --card: #2a1020;
+    --border: #4a2535;
+    --green: #00e676;
+    --green-dim: #00e67618;
+    --red: #ff4444;
+    --red-dim: #ff444418;
+    --gold: #ffcc00;
+    --blue: #cc66ff;
+    --text: #f0dde5;
+    --text-dim: #9a7080;
+    --mono: 'IBM Plex Mono', monospace;
+    --ar: 'Cairo', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ar);
+    min-height: 100vh;
+    padding: 10px;
+  }
+
+/* HEADER */
+.header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 10px 14px;
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 12px;
+margin-bottom: 10px;
+}
+.logo { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 1px; }
+.logo span { color: var(–blue); }
+.pair { font-family: var(–mono); font-size: 14px; color: var(–gold); font-weight: 600; }
+.clock { font-family: var(–mono); font-size: 12px; color: var(–text-dim); }
+
+/* MARKETS */
+.markets {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 6px;
+margin-bottom: 10px;
+}
+.mkt {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 6px 5px;
+display: flex;
+align-items: center;
+gap: 5px;
+transition: border-color 0.3s;
+}
+.mkt.open { border-color: var(–green); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot.g { background: var(–green); box-shadow: 0 0 6px var(–green); animation: blink 1.4s infinite; }
+.dot.r { background: var(–red); }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+.mkt-name { font-size: 9px; font-weight: 700; color: #fff; }
+.mkt-st { font-size: 8px; margin-top: 1px; }
+.mkt-st.open { color: var(–green); }
+.mkt-st.closed { color: var(–red); }
+
+/* CHART */
+.chart-wrap {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 12px;
+overflow: hidden;
+margin-bottom: 10px;
+}
+#tv-chart { width: 100%; height: 300px; display: block; }
+
+/* ANALYZE BTN */
+.analyze-btn {
+width: 100%;
+background: linear-gradient(135deg, #6a0dad, #aa00ff);
+border: none;
+border-radius: 10px;
+padding: 14px;
+color: #fff;
+font-family: var(–ar);
+font-size: 17px;
+font-weight: 900;
+cursor: pointer;
+margin-bottom: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+.analyze-btn:disabled { opacity: 0.5; }
+.spinner {
+display: none;
+width: 16px; height: 16px;
+border: 2px solid rgba(255,255,255,0.3);
+border-top-color: #fff;
+border-radius: 50%;
+animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* SIGNAL */
+.signal-box {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 12px;
+overflow: hidden;
+margin-bottom: 10px;
+}
+.sig-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 9px 14px;
+border-bottom: 1px solid var(–border);
+font-size: 12px;
+color: var(–blue);
+font-weight: 700;
+}
+.sig-body {
+padding: 16px;
+text-align: center;
+min-height: 110px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+.sig-idle { font-size: 12px; color: var(–text-dim); line-height: 1.7; }
+.sig-dir { font-family: var(–mono); font-size: 38px; font-weight: 700; line-height: 1; }
+.sig-dir.call { color: var(–green); text-shadow: 0 0 20px var(–green); }
+.sig-dir.put  { color: var(–red);   text-shadow: 0 0 20px var(–red); }
+.sig-dur { font-family: var(–mono); font-size: 13px; font-weight: 600; padding: 4px 14px; border-radius: 20px; }
+.sig-dur.call { background: var(–green-dim); color: var(–green); border: 1px solid var(–green); }
+.sig-dur.put  { background: var(–red-dim);   color: var(–red);   border: 1px solid var(–red); }
+.sig-info { font-size: 11px; color: var(–text-dim); }
+
+/* CONSENSUS */
+.consensus {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 12px 14px;
+margin-bottom: 10px;
+}
+.cons-title { font-size: 11px; color: var(–text-dim); margin-bottom: 8px; font-weight: 700; }
+.cons-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 6px 0;
+border-bottom: 1px solid var(–border);
+font-size: 12px;
+}
+.cons-row:last-of-type { border-bottom: none; }
+.cons-name { color: var(–text); }
+.badge {
+font-family: var(–mono);
+font-size: 10px;
+font-weight: 700;
+padding: 2px 8px;
+border-radius: 4px;
+border: 1px solid;
+min-width: 52px;
+text-align: center;
+}
+.badge.n    { color: var(–text-dim); border-color: var(–border); }
+.badge.call { color: var(–green); border-color: var(–green); background: var(–green-dim); }
+.badge.put  { color: var(–red);   border-color: var(–red);   background: var(–red-dim); }
+.badge.wait { color: var(–gold);  border-color: var(–gold);  background: #ffcc0015; }
+.conf-bar-wrap { margin-top: 8px; }
+.conf-label-row { display: flex; justify-content: space-between; font-size: 10px; color: var(–text-dim); margin-bottom: 3px; }
+.conf-bar { height: 4px; background: var(–border); border-radius: 2px; overflow: hidden; }
+.conf-fill { height: 100%; border-radius: 2px; transition: width 0.8s; }
+.conf-fill.call { background: var(–green); }
+.conf-fill.put  { background: var(–red); }
+
+/* LOG */
+.log-wrap {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 12px;
+overflow: hidden;
+}
+.log-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 9px 14px;
+border-bottom: 1px solid var(–border);
+font-size: 11px;
+color: var(–text-dim);
+}
+.log-clear { background: none; border: none; color: var(–text-dim); font-family: var(–ar); font-size: 11px; cursor: pointer; }
+.log-list { max-height: 130px; overflow-y: auto; }
+.log-empty { padding: 14px; text-align: center; font-size: 12px; color: var(–text-dim); }
+.log-entry {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 6px 14px;
+border-bottom: 1px solid var(–border);
+font-size: 11px;
+font-family: var(–mono);
+animation: fi 0.3s ease;
+}
+@keyframes fi { from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none} }
+.log-entry:last-child { border-bottom: none; }
+.le-time { color: var(–text-dim); width: 42px; flex-shrink: 0; }
+.le-sig  { font-weight: 700; width: 44px; flex-shrink: 0; }
+.le-sig.call { color: var(–green); }
+.le-sig.put  { color: var(–red); }
+.le-desc { flex: 1; color: var(–text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.le-dur  { color: var(–gold); flex-shrink: 0; }
+
+.note {
+margin-top: 10px;
+background: #ffcc0010;
+border: 1px solid #ffcc0035;
+border-radius: 8px;
+padding: 9px 12px;
+font-size: 11px;
+color: var(–gold);
+text-align: center;
+}
+</style>
+
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">SNIPER <span>BOT</span></div>
+  <div class="pair">EUR/USD</div>
+  <div class="clock" id="clock">--:--</div>
+</div>
+
+<div class="markets">
+  <div class="mkt" id="m-sydney">
+    <div class="dot r" id="d-sydney"></div>
+    <div>
+      <div class="mkt-name">Sydney</div>
+      <div class="mkt-st closed" id="s-sydney">مغلق</div>
+    </div>
+  </div>
+  <div class="mkt" id="m-tokyo">
+    <div class="dot r" id="d-tokyo"></div>
+    <div>
+      <div class="mkt-name">Tokyo</div>
+      <div class="mkt-st closed" id="s-tokyo">مغلق</div>
+    </div>
+  </div>
+  <div class="mkt" id="m-london">
+    <div class="dot r" id="d-london"></div>
+    <div>
+      <div class="mkt-name">London</div>
+      <div class="mkt-st closed" id="s-london">مغلق</div>
+    </div>
+  </div>
+  <div class="mkt" id="m-ny">
+    <div class="dot r" id="d-ny"></div>
+    <div>
+      <div class="mkt-name">New York</div>
+      <div class="mkt-st closed" id="s-ny">مغلق</div>
+    </div>
+  </div>
+</div>
+
+<div class="chart-wrap">
+  <div id="tv-chart"></div>
+</div>
+
+<button class="analyze-btn" id="abtn" onclick="analyzeNow()">
+  <span id="btn-text">🔍 تحليل الآن</span>
+  <span class="spinner" id="spinner"></span>
+</button>
+
+<div class="signal-box">
+  <div class="sig-header">
+    <span>🎯 إشارة التداول</span>
+    <span id="sig-time" style="color:var(--text-dim);font-size:11px;font-family:var(--mono)"></span>
+  </div>
+  <div class="sig-body" id="sig-body">
+    <div class="sig-idle">اضغط <strong style="color:var(--blue)">تحليل الآن</strong><br>لتحليل الأربع استراتيجيات معاً</div>
+  </div>
+</div>
+
+<div class="consensus">
+  <div class="cons-title">🤖 توافق الاستراتيجيات</div>
+  <div class="cons-row">
+    <span class="cons-name">📈 Trend Following</span>
+    <span class="badge n" id="b0">—</span>
+  </div>
+  <div class="cons-row">
+    <span class="cons-name">🎯 Bollinger + Stoch</span>
+    <span class="badge n" id="b1">—</span>
+  </div>
+  <div class="cons-row">
+    <span class="cons-name">🔄 MACD + RSI</span>
+    <span class="badge n" id="b2">—</span>
+  </div>
+  <div class="cons-row">
+    <span class="cons-name">🐊 Alligator</span>
+    <span class="badge n" id="b3">—</span>
+  </div>
+  <div class="conf-bar-wrap" id="conf-wrap" style="display:none">
+    <div class="conf-label-row">
+      <span>توافق</span><span id="conf-count">0/4</span>
+    </div>
+    <div class="conf-bar"><div class="conf-fill call" id="conf-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="log-wrap">
+  <div class="log-header">
+    <span>📋 سجل الإشارات</span>
+    <button class="log-clear" onclick="clearLog()">مسح</button>
+  </div>
+  <div class="log-list" id="log-list">
+    <div class="log-empty">لا توجد إشارات بعد</div>
+  </div>
+</div>
+
+<div class="note">⚠️ أدخل الصفقة قبل ~30 ثانية من الإشارة</div>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+
+<script>
+
+// CHART
+new TradingView.widget({
+  autosize: true,
+  symbol: "FX:EURUSD",
+  interval: "5",
+  timezone: "Etc/UTC",
+  theme: "dark",
+  style: "1",
+  locale: "en",
+  toolbar_bg: "#1a0a14",
+  save_image: false,
+  container_id: "tv-chart",
+  height: 300,
+  studies: ["MACD@tv-basicstudies","RSI@tv-basicstudies"],
+  overrides: {
+    "paneProperties.background": "#1a0a14",
+    "paneProperties.vertGridProperties.color": "#2a1020",
+    "paneProperties.horzGridProperties.color": "#2a1020"
+  }
+});
+
+// CLOCK
+function updateClock() {
+  const n = new Date();
+  const h = String(n.getUTCHours()).padStart(2,'0');
+  const m = String(n.getUTCMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = h+':'+m+' UTC';
+  updateMarkets(n.getUTCHours());
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// MARKETS
+const MKT = { sydney:{o:22,c:7}, tokyo:{o:0,c:9}, london:{o:8,c:17}, ny:{o:13,c:22} };
+function isOpen(o,c,h){ return o<c ? h>=o&&h<c : h>=o||h<c; }
+function updateMarkets(h) {
+  for (const [k,v] of Object.entries(MKT)) {
+    const op = isOpen(v.o, v.c, h);
+    document.getElementById('m-'+k).classList.toggle('open', op);
+    document.getElementById('d-'+k).className = 'dot '+(op?'g':'r');
+    const s = document.getElementById('s-'+k);
+    s.className = 'mkt-st '+(op?'open':'closed');
+    s.textContent = op?'مفتوح':'مغلق';
+  }
+}
+
+// API
+const API_KEY = 'a16e72269b854e348b1adc5a3e8c3387';
+
+async function fetchCandles() {
+  const url = 'https://corsproxy.io/?https://api.twelvedata.com/time_series?symbol=EUR%2FUSD&interval=5min&outputsize=250&apikey='+API_KEY;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.status==='error'||!data.values) throw new Error(data.message||'API Error');
+  return data.values.map(v=>({
+    open:parseFloat(v.open), high:parseFloat(v.high),
+    low:parseFloat(v.low),   close:parseFloat(v.close)
+  })).reverse();
+}
+
+// INDICATORS
+function ema(arr,p){
+  const k=2/(p+1); let prev=arr.slice(0,p).reduce((a,b)=>a+b,0)/p;
+  const out=[prev];
+  for(let i=p;i<arr.length;i++){prev=arr[i]*k+prev*(1-k);out.push(prev);}
+  return out;
+}
+function sma(arr,p){
+  const out=[];
+  for(let i=p-1;i<arr.length;i++) out.push(arr.slice(i-p+1,i+1).reduce((a,b)=>a+b,0)/p);
+  return out;
+}
+function rsiCalc(cl,p=14){
+  const ch=cl.slice(1).map((v,i)=>v-cl[i]);
+  let g=ch.slice(0,p).filter(c=>c>0).reduce((a,b)=>a+b,0)/p;
+  let l=Math.abs(ch.slice(0,p).filter(c=>c<0).reduce((a,b)=>a+b,0))/p;
+  const out=[];
+  for(let i=p;i<ch.length;i++){
+    g=(g*(p-1)+(ch[i]>0?ch[i]:0))/p;
+    l=(l*(p-1)+(ch[i]<0?Math.abs(ch[i]):0))/p;
+    out.push(l===0?100:100-100/(1+g/l));
+  }
+  return out;
+}
+function macdCalc(cl){
+  const e12=ema(cl,12),e26=ema(cl,26),d=e12.length-e26.length;
+  const ml=e26.map((v,i)=>e12[i+d]-v);
+  const sig=ema(ml,9),sd=ml.length-sig.length;
+  return {ml,sig,hist:sig.map((v,i)=>ml[i+sd]-v)};
+}
+function stochCalc(H,L,C,k=14,d=3){
+  const kA=[];
+  for(let i=k-1;i<C.length;i++){
+    const hh=Math.max(...H.slice(i-k+1,i+1)),ll=Math.min(...L.slice(i-k+1,i+1));
+    kA.push(hh===ll?50:(C[i]-ll)/(hh-ll)*100);
+  }
+  return {k:kA,d:sma(kA,d)};
+}
+function bbCalc(cl,p=20,m=2){
+  const mid=sma(cl,p),up=[],lo=[];
+  for(let i=p-1;i<cl.length;i++){
+    const sl=cl.slice(i-p+1,i+1),mn=mid[i-(p-1)];
+    const std=Math.sqrt(sl.reduce((a,b)=>a+(b-mn)**2,0)/p);
+    up.push(mn+m*std);lo.push(mn-m*std);
+  }
+  return {mid,up,lo};
+}
+function atrCalc(H,L,C,p=14){
+  const tr=[];
+  for(let i=1;i<C.length;i++) tr.push(Math.max(H[i]-L[i],Math.abs(H[i]-C[i-1]),Math.abs(L[i]-C[i-1])));
+  return sma(tr,p);
+}
+function getDur(s){ return s>=85?'5 دقائق':s>=70?'3 دقائق':s>=55?'دقيقتان':'دقيقة'; }
+
+// STRATEGIES
+function analyzeTrend(c){
+  const cl=c.map(x=>x.close),rsi=rsiCalc(cl),e50=ema(cl,50),e200=ema(cl,200);
+  const lc=cl[cl.length-1],lr=rsi[rsi.length-1];
+  const e5=e50[e50.length-1],e2=e200[e200.length-1],e5p=e50[e50.length-2];
+  let dir=null,str=50;
+  if(e5>e2&&lc>e5&&lr>50&&lr<70){dir='CALL';str=60+(lr-50)*1.5+(e5>e5p?10:0);}
+  else if(e5<e2&&lc<e5&&lr<50&&lr>30){dir='PUT';str=60+(50-lr)*1.5+(e5<e5p?10:0);}
+  return {dir,str:Math.min(95,Math.max(50,str))};
+}
+function analyzeBB(c){
+  const cl=c.map(x=>x.close),H=c.map(x=>x.high),L=c.map(x=>x.low);
+  const bb=bbCalc(cl),st=stochCalc(H,L,cl);
+  const n=bb.up.length,lc=cl[cl.length-1];
+  const up=bb.up[n-1],lo=bb.lo[n-1];
+  const sk=st.k[st.k.length-1],skp=st.k[st.k.length-2];
+  let dir=null,str=50;
+  if(lc<=lo&&sk<20&&sk>skp){dir='CALL';str=65+(20-sk)*1.5;}
+  else if(lc>=up&&sk>80&&sk<skp){dir='PUT';str=65+(sk-80)*1.5;}
+  return {dir,str:Math.min(95,Math.max(50,str))};
+}
+function analyzeMACDRSI(c){
+  const cl=c.map(x=>x.close),rsi=rsiCalc(cl);
+  const {ml,sig}=macdCalc(cl);
+  const lr=rsi[rsi.length-1];
+  const lm=ml[ml.length-1],ls=sig[sig.length-1];
+  const pm=ml[ml.length-2],ps=sig[sig.length-2];
+  let dir=null,str=50;
+  if(pm<ps&&lm>ls&&lr>30&&lr<60){dir='CALL';str=65+Math.abs(lm-ls)*50000+(lr>40?10:0);}
+  else if(pm>ps&&lm<ls&&lr<70&&lr>40){dir='PUT';str=65+Math.abs(lm-ls)*50000+(lr<60?10:0);}
+  return {dir,str:Math.min(95,Math.max(50,str))};
+}
+function analyzeAlligator(c){
+  const cl=c.map(x=>x.close),H=c.map(x=>x.high),L=c.map(x=>x.low);
+  const med=c.map(x=>(x.high+x.low)/2);
+  const jaw=ema(med,13),teeth=ema(med,8),lips=ema(med,5);
+  const atr=atrCalc(H,L,cl);
+  const lc=cl[cl.length-1];
+  const lj=jaw[jaw.length-1],lt=teeth[teeth.length-1],ll=lips[lips.length-1];
+  const latr=atr[atr.length-1],spread=Math.abs(ll-lj);
+  const sleeping=spread<latr*0.3;
+  let dir=null,str=50;
+  if(!sleeping){
+    if(ll>lt&&lt>lj&&lc>ll){dir='CALL';str=65+(spread/latr)*15;}
+    else if(ll<lt&&lt<lj&&lc<ll){dir='PUT';str=65+(spread/latr)*15;}
+  }
+  return {dir,str:Math.min(95,Math.max(50,str))};
+}
+
+// Run after page load to avoid hoisting issues
+window.STRATS = null;
+window.addEventListener('load', function() {
+  window.STRATS = [
+    {name:'Trend Following', fn:analyzeTrend},
+    {name:'Bollinger+Stoch', fn:analyzeBB},
+    {name:'MACD+RSI',        fn:analyzeMACDRSI},
+    {name:'Alligator',       fn:analyzeAlligator}
+  ];
+});
+
+async function analyzeNow() {
+  if (!window.STRATS) { alert('جاري تحميل الصفحة، انتظر ثانية'); return; }
+  const btn=document.getElementById('abtn');
+  const sp=document.getElementById('spinner');
+  const bt=document.getElementById('btn-text');
+  btn.disabled=true; sp.style.display='inline-block'; bt.textContent='جاري التحليل...';
+  ['b0','b1','b2','b3'].forEach(id=>{
+    const b=document.getElementById(id); b.textContent='...'; b.className='badge n';
+  });
+  try {
+    const candles = await fetchCandles();
+    const results = window.STRATS.map(s=>s.fn(candles));
+    results.forEach((r,i)=>{
+      const b=document.getElementById('b'+i);
+      if(r.dir==='CALL'){b.textContent='▲ CALL';b.className='badge call';}
+      else if(r.dir==='PUT'){b.textContent='▼ PUT';b.className='badge put';}
+      else{b.textContent='⏳ انتظر';b.className='badge wait';}
+    });
+    const calls=results.filter(r=>r.dir==='CALL');
+    const puts=results.filter(r=>r.dir==='PUT');
+    let finalDir=null,agree=0;
+    if(calls.length>puts.length){finalDir='CALL';agree=calls.length;}
+    else if(puts.length>calls.length){finalDir='PUT';agree=puts.length;}
+
+    const cw=document.getElementById('conf-wrap');
+    const cf=document.getElementById('conf-fill');
+    const cc=document.getElementById('conf-count');
+    cw.style.display='block';
+    cc.textContent=agree+'/4';
+    cf.style.width=(agree/4*100)+'%';
+    cf.className='conf-fill '+(finalDir?finalDir.toLowerCase():'call');
+
+    if(!finalDir||agree<2){ showWait(); }
+    else {
+      const agRs=finalDir==='CALL'?calls:puts;
+      const avgStr=agRs.reduce((a,r)=>a+r.str,0)/agRs.length;
+      const fs=Math.min(97,avgStr+(agree-1)*6);
+      showSignal(finalDir,fs,agree);
+      addLog(finalDir,agree,getDur(fs),fs);
+    }
+  } catch(e) {
+    showErr('❌ '+e.message);
+  } finally {
+    btn.disabled=false; sp.style.display='none'; bt.textContent='🔍 تحليل الآن';
+  }
+}
+
+function showSignal(dir,str,agree){
+  const now=new Date();
+  document.getElementById('sig-time').textContent=
+    String(now.getUTCHours()).padStart(2,'0')+':'+String(now.getUTCMinutes()).padStart(2,'0')+' UTC';
+  const d=getDur(str);
+  document.getElementById('sig-body').innerHTML=
+    '<div class="sig-dir '+dir.toLowerCase()+'">'+(dir==='CALL'?'▲ CALL':'▼ PUT')+'</div>'+
+    '<div class="sig-dur '+dir.toLowerCase()+'">⏱ '+d+'</div>'+
+    '<div class="sig-info">توافق '+agree+'/4 · قوة '+Math.round(str)+'%</div>';
+}
+function showWait(){
+  document.getElementById('sig-body').innerHTML=
+    '<div style="font-size:26px">⏳</div>'+
+    '<div style="color:var(--gold);font-weight:700">لا توافق — انتظر</div>'+
+    '<div class="sig-idle">الاستراتيجيات متضاربة<br>جرب بعد دقيقتين</div>';
+}
+function showErr(msg){
+  document.getElementById('sig-body').innerHTML='<div style="color:var(--red);font-size:13px">'+msg+'</div>';
+}
+function addLog(dir,agree,d,str){
+  const list=document.getElementById('log-list');
+  if(list.querySelector('.log-empty')) list.innerHTML='';
+  const now=new Date();
+  const t=String(now.getUTCHours()).padStart(2,'0')+':'+String(now.getUTCMinutes()).padStart(2,'0');
+  const el=document.createElement('div');
+  el.className='log-entry';
+  el.innerHTML=
+    '<span class="le-time">'+t+'</span>'+
+    '<span class="le-sig '+dir.toLowerCase()+'">'+(dir==='CALL'?'▲':'▼')+' '+dir+'</span>'+
+    '<span class="le-desc">توافق '+agree+'/4</span>'+
+    '<span class="le-dur">'+d+'</span>';
+  list.insertBefore(el,list.firstChild);
+}
+function clearLog(){
+  document.getElementById('log-list').innerHTML='<div class="log-empty">لا توجد إشارات بعد</div>';
+}
+</script>
+
+</body>
+</html>
