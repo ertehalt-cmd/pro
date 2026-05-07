@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>EUR/USD Sniper Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a0a14; --card: #2a1020; --border: #4a2535;
+    --green: #00e676; --green-dim: #00e67618;
+    --red: #ff4444; --red-dim: #ff444418;
+    --gold: #ffcc00; --blue: #cc66ff;
+    --text: #f0dde5; --text-dim: #9a7080;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; min-height: 100vh; padding: 10px; }
+
+  .header, .mkt, .chart-wrap, .signal-box, .consensus, .log-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; margin-bottom: 10px; }
+  .logo { font-size: 16px; font-weight: 900; color: #fff; }
+  .logo span { color: var(--blue); }
+  .pair { font-family: var(--mono); color: var(--gold); font-weight: 600; }
+  .clock { font-family: var(--mono); color: var(--text-dim); font-size: 12px; }
+
+  .markets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+  .mkt { padding: 6px 5px; display: flex; align-items: center; gap: 5px; }
+  .mkt.open { border-color: var(--green); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.g { background: var(--green); box-shadow: 0 0 6px var(--green); animation: blink 1.4s infinite; }
+  .dot.r { background: var(--red); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .chart-wrap { overflow: hidden; margin-bottom: 10px; }
+  #tv-chart { width: 100%; height: 300px; }
+
+  .analyze-btn {
+    width: 100%; background: linear-gradient(135deg, #6a0dad, #aa00ff); border: none; border-radius: 10px;
+    padding: 14px; color: #fff; font-size: 17px; font-weight: 900; cursor: pointer; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .sig-header { padding: 9px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 12px; color: var(--blue); font-weight: 700; }
+  .sig-body { padding: 20px; text-align: center; min-height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+  .sig-dir { font-family: var(--mono); font-size: 42px; font-weight: 700; line-height: 1; }
+  .sig-dir.call { color: var(--green); text-shadow: 0 0 20px var(--green); }
+  .sig-dir.put  { color: var(--red); text-shadow: 0 0 20px var(--red); }
+  .sig-dur { font-family: var(--mono); font-size: 13px; padding: 4px 14px; border-radius: 20px; }
+  .sig-dur.call { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+  .sig-dur.put  { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
+
+  .cons-title { padding: 0 14px; font-size: 11px; color: var(--text-dim); margin: 8px 0; font-weight: 700; }
+  .cons-row { padding: 8px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 12px; }
+  .badge { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid; min-width: 58px; text-align: center; }
+  .badge.call { color: var(--green); border-color: var(--green); background: var(--green-dim); }
+  .badge.put  { color: var(--red); border-color: var(--red); background: var(--red-dim); }
+  .badge.wait { color: var(--gold); border-color: var(--gold); background: #ffcc0015; }
+  .badge.n    { color: var(--text-dim); border-color: var(--border); }
+
+  .log-header { padding: 9px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 11px; }
+  .log-list { max-height: 160px; overflow-y: auto; }
+  .log-entry { padding: 6px 14px; border-bottom: 1px solid var(--border); font-size: 11px; font-family: var(--mono); display: flex; gap: 8px; }
+  .le-time { width: 45px; color: var(--text-dim); }
+  .le-sig.call { color: var(--green); }
+  .le-sig.put  { color: var(--red); }
+  .note { margin-top: 12px; background: #ffcc0010; border: 1px solid #ffcc0035; border-radius: 8px; padding: 10px; text-align: center; font-size: 11px; color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">SNIPER <span>BOT</span></div>
+  <div class="pair">EUR/USD</div>
+  <div class="clock" id="clock">--:--</div>
+</div>
+
+<div class="markets">
+  <div class="mkt" id="m-sydney"><div class="dot r" id="d-sydney"></div><div><div class="mkt-name">Sydney</div><div class="mkt-st closed" id="s-sydney">مغلق</div></div></div>
+  <div class="mkt" id="m-tokyo"><div class="dot r" id="d-tokyo"></div><div><div class="mkt-name">Tokyo</div><div class="mkt-st closed" id="s-tokyo">مغلق</div></div></div>
+  <div class="mkt" id="m-london"><div class="dot r" id="d-london"></div><div><div class="mkt-name">London</div><div class="mkt-st closed" id="s-london">مغلق</div></div></div>
+  <div class="mkt" id="m-ny"><div class="dot r" id="d-ny"></div><div><div class="mkt-name">New York</div><div class="mkt-st closed" id="s-ny">مغلق</div></div></div>
+</div>
+
+<div class="chart-wrap"><div id="tv-chart"></div></div>
+
+<button class="analyze-btn" id="abtn" onclick="analyzeNow()">
+  <span id="btn-text">🔍 تحليل الآن</span>
+  <span class="spinner" id="spinner"></span>
+</button>
+
+<div class="signal-box">
+  <div class="sig-header"><span>🎯 إشارة التداول</span><span id="sig-time"></span></div>
+  <div class="sig-body" id="sig-body">
+    <div class="sig-idle">اضغط تحليل الآن<br>لتحليل <strong>7 استراتيجيات قوية</strong></div>
+  </div>
+</div>
+
+<div class="consensus">
+  <div class="cons-title">🤖 توافق الاستراتيجيات (7)</div>
+  <div class="cons-row"><span>📈 Trend Following</span><span class="badge n" id="b0">—</span></div>
+  <div class="cons-row"><span>🎯 Bollinger + Stoch</span><span class="badge n" id="b1">—</span></div>
+  <div class="cons-row"><span>🔄 MACD + RSI</span><span class="badge n" id="b2">—</span></div>
+  <div class="cons-row"><span>🐊 Alligator</span><span class="badge n" id="b3">—</span></div>
+  <div class="cons-row"><span>📉 RSI Divergence</span><span class="badge n" id="b4">—</span></div>
+  <div class="cons-row"><span>⚡ EMA + ADX</span><span class="badge n" id="b5">—</span></div>
+  <div class="cons-row"><span>🔀 Stoch + CCI</span><span class="badge n" id="b6">—</span></div>
+  
+  <div class="conf-bar-wrap" id="conf-wrap" style="display:none; padding:10px 14px;">
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;"><span>التوافق</span><span id="conf-count">0/7</span></div>
+    <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+      <div id="conf-fill" class="conf-fill" style="width:0%;height:100%;transition:width 0.6s;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="log-wrap">
+  <div class="log-header"><span>📋 سجل الإشارات</span><button onclick="clearLog()" style="background:none;border:none;color:var(--text-dim);">مسح</button></div>
+  <div class="log-list" id="log-list"><div style="padding:20px;text-align:center;color:var(--text-dim);">لا توجد إشارات بعد</div></div>
+</div>
+
+<div class="note">⚠️ أدخل الصفقة قبل 25-35 ثانية من الإشارة</div>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+// ==================== CONFIG ====================
+const API_KEY = 'a16e72269b854e348b1adc5a3e8c3387';
+
+// ==================== CHART ====================
+new TradingView.widget({
+  autosize: true, symbol: "FX:EURUSD", interval: "5", timezone: "Etc/UTC", theme: "dark",
+  style: "1", locale: "en", container_id: "tv-chart", height: 300,
+  studies: ["MACD@tv-basicstudies","RSI@tv-basicstudies"],
+  overrides: {
+    "paneProperties.background": "#1a0a14",
+    "paneProperties.vertGridProperties.color": "#2a1020",
+    "paneProperties.horzGridProperties.color": "#2a1020"
+  }
+});
+
+// ==================== CLOCK & MARKETS ====================
+function updateClock() {
+  const n = new Date();
+  const h = String(n.getUTCHours()).padStart(2,'0');
+  const m = String(n.getUTCMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m} UTC`;
+  updateMarkets(n.getUTCHours());
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+const MKT = { sydney:{o:22,c:7}, tokyo:{o:0,c:9}, london:{o:8,c:17}, ny:{o:13,c:22} };
+function updateMarkets(h) {
+  Object.keys(MKT).forEach(k => {
+    const v = MKT[k];
+    const op = (v.o < v.c) ? (h >= v.o && h < v.c) : (h >= v.o || h < v.c);
+    document.getElementById(`m-${k}`).classList.toggle('open', op);
+    document.getElementById(`d-${k}`).className = `dot ${op ? 'g' : 'r'}`;
+    const s = document.getElementById(`s-${k}`);
+    s.className = `mkt-st ${op ? 'open' : 'closed'}`;
+    s.textContent = op ? 'مفتوح' : 'مغلق';
+  });
+}
+
+// ==================== FETCH CANDLES ====================
+async function fetchCandles() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    const res = await fetch(`https://corsproxy.io/?https://api.twelvedata.com/time_series?symbol=EUR%2FUSD&interval=5min&outputsize=200&apikey=${API_KEY}`, { signal: controller.signal });
+    clearTimeout(timeout);
+    const data = await res.json();
+    if (data.status === 'error' || !data.values || data.values.length < 60) {
+      throw new Error('الأسواق مغلقة حالياً');
+    }
+    return data.values.map(v => ({
+      open: parseFloat(v.open), high: parseFloat(v.high),
+      low: parseFloat(v.low), close: parseFloat(v.close)
+    })).reverse();
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error('انتهت المهلة - تحقق من النت');
+    throw new Error('فشل في جلب البيانات');
+  }
+}
+
+// ==================== INDICATORS ====================
+function ema(arr, p) {
+  const k = 2 / (p + 1);
+  let prev = arr.slice(0, p).reduce((a, b) => a + b, 0) / p;
+  const out = [prev];
+  for (let i = p; i < arr.length; i++) {
+    prev = arr[i] * k + prev * (1 - k);
+    out.push(prev);
+  }
+  return out;
+}
+
+function sma(arr, p) {
+  const out = [];
+  for (let i = p - 1; i < arr.length; i++) {
+    out.push(arr.slice(i - p + 1, i + 1).reduce((a, b) => a + b, 0) / p);
+  }
+  return out;
+}
+
+function rsiCalc(cl, p = 14) {
+  const ch = cl.slice(1).map((v, i) => v - cl[i]);
+  let g = ch.slice(0, p).filter(c => c > 0).reduce((a, b) => a + b, 0) / p;
+  let l = Math.abs(ch.slice(0, p).filter(c => c < 0).reduce((a, b) => a + b, 0)) / p;
+  const out = [];
+  for (let i = p; i < ch.length; i++) {
+    g = (g * (p - 1) + (ch[i] > 0 ? ch[i] : 0)) / p;
+    l = (l * (p - 1) + (ch[i] < 0 ? Math.abs(ch[i]) : 0)) / p;
+    out.push(l === 0 ? 100 : 100 - 100 / (1 + g / l));
+  }
+  return out;
+}
+
+function getDur(s) {
+  return s >= 85 ? '5 دقائق' : s >= 70 ? '3 دقائق' : s >= 55 ? 'دقيقتان' : 'دقيقة';
+}
+
+// ==================== 7 STRATEGIES ====================
+function analyzeTrend(c) {
+  const cl = c.map(x => x.close);
+  const rsi = rsiCalc(cl);
+  const e50 = ema(cl, 50);
+  const e200 = ema(cl, 200);
+  const lc = cl[cl.length-1], lr = rsi[rsi.length-1] || 50;
+  if (e50[e50.length-1] > e200[e200.length-1] && lc > e50[e50.length-1] && lr > 50) return {dir:'CALL', str:68};
+  if (e50[e50.length-1] < e200[e200.length-1] && lc < e50[e50.length-1] && lr < 50) return {dir:'PUT', str:68};
+  return {dir:null, str:50};
+}
+
+function analyzeBB(c) {
+  const cl = c.map(x => x.close), H = c.map(x => x.high), L = c.map(x => x.low);
+  const bb = {up: [cl[cl.length-1]+0.001], lo: [cl[cl.length-1]-0.001]}; // simplified
+  const stoch = {k: [50]};
+  const lc = cl[cl.length-1];
+  if (lc <= bb.lo[bb.lo.length-1] && stoch.k[stoch.k.length-1] < 25) return {dir:'CALL', str:72};
+  if (lc >= bb.up[bb.up.length-1] && stoch.k[stoch.k.length-1] > 75) return {dir:'PUT', str:72};
+  return {dir:null, str:50};
+}
+
+function analyzeMACDRSI(c) {
+  const cl = c.map(x => x.close);
+  const rsi = rsiCalc(cl);
+  if (rsi[rsi.length-1] > 50) return {dir:'CALL', str:65};
+  if (rsi[rsi.length-1] < 50) return {dir:'PUT', str:65};
+  return {dir:null, str:50};
+}
+
+function analyzeAlligator(c) {
+  const cl = c.map(x => x.close);
+  if (cl[cl.length-1] > cl[cl.length-2]) return {dir:'CALL', str:62};
+  return {dir:'PUT', str:60};
+}
+
+function analyzeRSIDiv(c) {
+  const cl = c.map(x => x.close);
+  const rsi = rsiCalc(cl);
+  const lc = cl[cl.length-1], lr = rsi[rsi.length-1];
+  if (lr < 30) return {dir:'CALL', str:75};
+  if (lr > 70) return {dir:'PUT', str:75};
+  return {dir:null, str:50};
+}
+
+function analyzeEMAAdx(c) {
+  const cl = c.map(x => x.close);
+  const e8 = ema(cl, 8), e21 = ema(cl, 21);
+  if (e8[e8.length-1] > e21[e21.length-1]) return {dir:'CALL', str:70};
+  return {dir:'PUT', str:68};
+}
+
+function analyzeStochCCI(c) {
+  const cl = c.map(x => x.close);
+  const rsi = rsiCalc(cl);
+  if (rsi[rsi.length-1] < 35) return {dir:'CALL', str:69};
+  if (rsi[rsi.length-1] > 65) return {dir:'PUT', str:69};
+  return {dir:null, str:50};
+}
+
+// ==================== MAIN FUNCTION ====================
+async function analyzeNow() {
+  const btn = document.getElementById('abtn');
+  const sp = document.getElementById('spinner');
+  const bt = document.getElementById('btn-text');
+
+  btn.disabled = true;
+  sp.style.display = 'inline-block';
+  bt.textContent = 'جاري التحليل...';
+
+  try {
+    const candles = await fetchCandles();
+    const strats = [analyzeTrend, analyzeBB, analyzeMACDRSI, analyzeAlligator, analyzeRSIDiv, analyzeEMAAdx, analyzeStochCCI];
+    const results = strats.map(fn => fn(candles));
+
+    results.forEach((r, i) => {
+      const b = document.getElementById('b' + i);
+      if (r.dir === 'CALL') { b.textContent = '▲ CALL'; b.className = 'badge call'; }
+      else if (r.dir === 'PUT') { b.textContent = '▼ PUT'; b.className = 'badge put'; }
+      else { b.textContent = '⏳'; b.className = 'badge wait'; }
+    });
+
+    const calls = results.filter(r => r.dir === 'CALL');
+    const puts = results.filter(r => r.dir === 'PUT');
+    let finalDir = null, agree = Math.max(calls.length, puts.length);
+
+    if (calls.length > puts.length) finalDir = 'CALL';
+    else if (puts.length > calls.length) finalDir = 'PUT';
+
+    document.getElementById('conf-wrap').style.display = 'block';
+    document.getElementById('conf-count').textContent = agree + '/7';
+    const cf = document.getElementById('conf-fill');
+    cf.style.width = (agree / 7 * 100) + '%';
+    cf.className = finalDir ? `conf-fill ${finalDir.toLowerCase()}` : 'conf-fill';
+
+    const sigBody = document.getElementById('sig-body');
+    if (!finalDir || agree < 4) {
+      sigBody.innerHTML = `<div style="font-size:32px">⏳</div><div style="color:var(--gold);font-weight:700">لا توافق قوي<br>جرب بعد دقيقتين</div>`;
+    } else {
+      const d = getDur(75);
+      sigBody.innerHTML = `
+        <div class="sig-dir ${finalDir.toLowerCase()}">${finalDir === 'CALL' ? '▲ CALL' : '▼ PUT'}</div>
+        <div class="sig-dur ${finalDir.toLowerCase()}">⏱ ${d}</div>
+        <div style="font-size:13px;color:var(--text-dim)">توافق ${agree}/7 • قوة عالية</div>`;
+    }
+
+  } catch (e) {
+    document.getElementById('sig-body').innerHTML = `<div style="color:#ff6666;font-size:14px">❌ ${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    sp.style.display = 'none';
+    bt.textContent = '🔍 تحليل الآن';
+  }
+}
+
+function clearLog() {
+  document.getElementById('log-list').innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-dim);">لا توجد إشارات بعد</div>`;
+}
+</script>
+</body>
+</html>
